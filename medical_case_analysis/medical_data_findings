@@ -1,0 +1,190 @@
+SELECT * FROM dbo.medical_InpatientDBDB;
+
+--1. Total number of admissions per month--
+Select Year, Month, Count(Patient_Name) as TotalAdmissions
+From dbo.medical_InpatientDBDB
+Group by Year, Month
+Order by Year, Month;
+
+--2. Patient's average length of stay--
+Select Year, Month, Avg(Admitted_Days) as AverageStay 
+FROM dbo.medical_InpatientDBDB
+Group by Year, Month
+Order by Year, Month;
+
+--3. Total Charges by Doctor--
+SELECT Doctor,SUM(Charge) as Doctor_Charge
+FROM dbo.medical_InpatientDBDB
+Group by Doctor
+Order by SUM(Charge) desc;
+
+--4. Average Age of Patients--
+SELECT Avg(Age) as PatientsAverageAge
+FROM dbo.medical_InpatientDBDB;
+
+--5. Discounts Given
+SELECT Patient_Name, SUM(D_AMT) as TotalDiscountsGiven
+FROM dbo.medical_InpatientDBDB
+Group by Patient_Name
+Order by TotalDiscountsGiven desc;
+
+--6. Cured vs Not cured
+SELECT Has_Cured as Status, COUNT(Has_Cured) as TotalStatusCount
+FROM dbo.medical_InpatientDBDB
+Group by Has_Cured
+Order by TotalStatusCount;
+
+--7. Mortality Rate compared with total admission--
+SELECT 
+    (CAST(COUNT(CASE WHEN IS_DEAD = 'Yes' THEN 1 END) as FLOAT) / 
+     COUNT(*)) * 100 as MortalityRatePercentage
+FROM dbo.medical_InpatientDBDB;
+
+--8. Financial summary by Gender--
+SELECT Gender, SUM(Charge), SUM(D_AMT) FROM dbo.medical_InpatientDBDB
+GROUP BY Gender;
+
+--9. Monthly Revenue--
+SELECT month, SUM(Charge) as Revenue FROM dbo.medical_InpatientDBDB
+GROUP by month
+Order by month;  
+
+--10. Patient Discharge Summary
+SELECT Patient_Name, Discharge_date, 
+COUNT(*) OVER(PARTITION BY Discharge_date) as TotalDischarge_patientsOnThatDay
+FROM dbo.medical_InpatientDBDB
+Order by Discharge_date;
+
+--11. Top 5 Most Seen Doctors--
+
+SELECT TOP 5 Doctor, Count(Admission_Date) as TotalPatientsAdmission
+FROM dbo.medical_InpatientDBDB
+Group by Doctor
+Order by TotalPatientsAdmission DESC;
+
+-- 12. Revenue Breakdown by District
+SELECT District, SUM(CHARGE) as Revenue FROM dbo.medical_InpatientDBDB
+GROUP BY District
+Order By Revenue DESC;
+
+--13 High-Charge Patients--
+SELECT Patient_Name, SUM(Charge) as HighCharge FROM dbo.medical_InpatientDBDB
+GROUP BY Patient_Name
+Having SUM(Charge) > 300000
+Order by HighCharge;
+
+--14. Average Daily Doctor Rate--
+SELECT AVG(Doctor_Rate) AS AverageDailyDoctorRate
+FROM dbo.medical_InpatientDBDB;
+
+--15. Patients with Multiple Admissions--
+SELECT Patient_Name, COUNT(*) as AdmittedMoreThanOne
+FROM dbo.medical_InpatientDBDB
+GROUP by Patient_Name
+Having COUNT(*)>1
+ORDER by AdmittedMoreThanOne desc;
+
+--16. Top 3 Doctors By Revenue
+SELECT TOP 3 Doctor, SUM(Charge) as RevenueGenerated from dbo.medical_InpatientDBDB
+Group by Doctor
+Order by RevenueGenerated DESC;
+
+--17. Patient Demographics--
+SELECT 
+    Gender,
+    AVG(CASE WHEN Has_Cured = 'Yes' THEN Age END) as AverageAgeCured,
+    COUNT(CASE WHEN Has_Cured = 'Yes' THEN 1 END) as TotalCured,
+    AVG(CASE WHEN Has_Cured = 'No' THEN Age END) as AverageAgeNotCured,
+    COUNT(CASE WHEN Has_Cured = 'No' THEN 1 END) as TotalNotCured
+FROM dbo.medical_InpatientDBDB
+Group by Gender
+Order by Gender;
+
+--18. Readmission Rate (admitted more than once)--
+--Calculate the percentage of patients who were readmitted (i.e., admitted more than once)
+--within 30 days of their last discharge date.
+
+
+
+
+
+--19. Charges Over Time by month for last year--
+SELECT Year, month, DRG_CODE, SUM(Charge) as TotalCharge
+FROM dbo.medical_InpatientDBDB
+GROUP by Year, month, DRG_CODE
+HAVING Year = (SELECT MAX(Year) FROM dbo.medical_InpatientDBDB)
+Order by TotalCharge DESC;
+
+
+--20. Dynamic Pivot Table--
+--Write a query that creates a pivot table
+--displaying the total number of admissions for each DRG_CODE by year.
+
+
+
+
+--21.Correlation Analysis--
+--Analyze the correlation between the length of stay (Admitted_Days)
+--and the total charges incurred by patients. Present average charges
+--segmented by length of stay brackets (e.g., 1-2 days, 3-5 days, etc.).
+
+
+
+
+
+--22.Patient Age Grouping--
+--Write a query to group patients into age ranges 
+--(e.g., 0-18, 19-35, 36-50, 51+) and provide the count for each group.
+SELECT
+    CASE 
+        WHEN Age < 19 THEN '0-18'
+        WHEN Age between 19 and 35 THEN '19-35'
+        WHEN Age between 36 and 50 THEN '36-50'
+    ELSE '51+' 
+END as AgeGroup,
+    COUNT(CASE 
+        WHEN Age < 19 THEN '0-18'
+        WHEN Age between 19 and 35 THEN '19-35'
+        WHEN Age between 36 and 50 THEN '36-50'
+    ELSE '51+' 
+END) as NumberOfPeople
+FROM dbo.medical_InpatientDBDB
+Group by CASE 
+        WHEN Age < 19 THEN '0-18'
+        WHEN Age between 19 and 35 THEN '19-35'
+        WHEN Age between 36 and 50 THEN '36-50'
+    ELSE '51+' 
+END
+Order by AgeGroup;
+
+
+--23. Latest Admission_Date with patient name and DRG_CODE
+SELECT DRG_CODE,Patient_Name, 
+Admission_Date
+FROM dbo.medical_InpatientDBDB
+GROUP BY DRG_CODE, Patient_Name, Admission_Date
+Having Admission_Date = (SELECT MAX(Admission_Date) FROM dbo.medical_InpatientDBDB)
+ORDER BY Admission_Date DESC; 
+
+--24. Latest Admission per patient--
+--Retrieve the latest admission date for each patient along with 
+--their name and the corresponding DRG_CODE.
+
+
+
+
+--25. Diagnosis Frequency--
+--Write a query to count how many times each diagnosis 
+--(represented by DRG_CODE) has occurred and order the results 
+--from most frequent to least frequent.
+
+
+
+
+
+
+
+
+--26. Financial Summary by district--
+--Create a summary report that lists total charges, total discounts,
+--and net revenue for each district, using your hospital's data.
