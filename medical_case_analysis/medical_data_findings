@@ -116,19 +116,29 @@ HAVING Year = (SELECT MAX(Year) FROM dbo.medical_InpatientDBDB)
 Order by TotalCharge DESC;
 
 
---20. Dynamic Pivot Table--
---Write a query that creates a pivot table
---displaying the total number of admissions for each DRG_CODE by year.
+--20. Write a query that 
+--display the total number of admissions for each DRG_CODE by year.
 
-
-
+SELECT Year, DRG_CODE, COUNT(*) as TotalAdmission
+FROM dbo.medical_InpatientDBDB
+Group by Year, DRG_CODE
+ORDER BY TotalAdmission DESC;
 
 --21.Correlation Analysis--
 --Analyze the correlation between the length of stay (Admitted_Days)
 --and the total charges incurred by patients. Present average charges
 --segmented by length of stay brackets (e.g., 1-2 days, 3-5 days, etc.).
 
-
+SELECT
+    CASE    
+        WHEN Admitted_Days between 1 and 2 THEN '1-2 days'
+        WHEN Admitted_Days between 3 and 5 THEN '3-5 days'
+        ELSE '6+ days'
+    END AS LengthOfStay,
+    AVG(Charge) AS AverageCharge
+FROM dbo.medical_InpatientDBDB
+GROUP BY Admitted_Days
+Order BY LengthOfStay;
 
 
 
@@ -166,9 +176,14 @@ GROUP BY DRG_CODE, Patient_Name, Admission_Date
 Having Admission_Date = (SELECT MAX(Admission_Date) FROM dbo.medical_InpatientDBDB)
 ORDER BY Admission_Date DESC; 
 
+
 --24. Latest Admission per patient--
 --Retrieve the latest admission date for each patient along with 
 --their name and the corresponding DRG_CODE.
+SELECT Patient_Name, Max(Admission_Date) as LatestAdDate, DRG_CODE
+FROM dbo.medical_InpatientDBDB
+Group by Patient_Name, DRG_CODE
+ORDER BY LatestAdDate;
 
 
 
@@ -177,14 +192,20 @@ ORDER BY Admission_Date DESC;
 --Write a query to count how many times each diagnosis 
 --(represented by DRG_CODE) has occurred and order the results 
 --from most frequent to least frequent.
-
-
-
-
-
+SELECT DRG_CODE, COUNT(*) as Frequency 
+FROM dbo.medical_InpatientDBDB
+Group by DRG_CODE
+ORDER BY Frequency DESC;
 
 
 
 --26. Financial Summary by district--
 --Create a summary report that lists total charges, total discounts,
 --and net revenue for each district, using your hospital's data.
+SELECT District, 
+SUM(Charge) as TotalCharges , 
+SUM(Discount) as TotalDiscount, 
+SUM(Net_Amount) as Net_Revenue
+FROM dbo.medical_InpatientDBDB
+GROUP BY District
+ORDER BY Net_Revenue;
