@@ -4,6 +4,9 @@ Bank Loan Report > Summary
 
 KPI’s
 
+Bank_Loan_Report_query_document: https://drive.google.com/file/d/1fFOmpbdb66dDEg-Udw9-IkIFtF271QUI/view?usp=sharing
+PowerBi Report: https://drive.google.com/file/d/1U5t3CjBFQZaiYoJItNkFQ5X7eeZiau7r/view?usp=sharing
+
 1. Total Loan application
 SELECT COUNT(id) AS Total_Loan_Applications FROM bank_loan_data
 
