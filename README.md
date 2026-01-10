@@ -1,6 +1,6 @@
-# DataAnalyst_Project
+# DataAnalyst_Project (SQL + PowerBI + Machine Learning)
 
-You can find complete data analyst projects covering various business case scenarios that not only provide SQL queries and PowerBi but also offer real-world solutions for businesses, leveraging technology within business concepts.
+You can find complete data analyst projects covering various business case scenarios that not only provide SQL queries, PowerBi and Machine learning predictions but also offer real-world solutions for businesses, leveraging technology within business concepts. 
 
 # Good Vs Bad Loan Summary 
 # Links
