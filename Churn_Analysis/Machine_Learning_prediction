@@ -1,0 +1,177 @@
+# Installing dependencies
+
+!pip install pandas numpy matplotlib
+!pip install seaborn scikit-learn joblib
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+import joblib
+
+---------------------------------------------
+from google.colab import files
+
+# Upload the CSV file
+uploaded = files.upload()
+
+
+------------------------------------------------------
+# The uploaded file is named "vw_churn_data_for_prediction.csv"
+data = pd.read_csv('vw_churn_data_for_prediction.csv')
+
+# Display the first few rows of the fetched data
+print(data.head())
+
+------------------------------------------------------------------------------------
+
+# Data processing
+data = data.drop(['Customer_ID', 'Churn_Category', 'Churn_Reason'], axis=1)
+
+# Collecting list of columns to be label encoded (conerting category to numerical values)
+columns_to_encode = ['Gender', 'Married', 'State', 'Value_Deal', 'Phone_Service',
+                     'Multiple_Lines','Internet_Service', 'Internet_Type', 'Online_Security',
+                     'Online_Backup','Device_Protection_Plan', 'Premium_Support', 'Streaming_TV',
+                     'Streaming_Movies','Streaming_Music', 'Unlimited_Data', 'Contract', 'Paperless_Billing',
+                     'Payment_Method']
+
+# Encoding categorical variables but not target variable and i.e Customer_Status.
+
+label_encoders = {}
+for column in columns_to_encode:
+    label_encoders[column] = LabelEncoder() 
+    data[column] = label_encoders[column].fit_transform(data[column])
+
+# Manually encode the target variable 'Customer_Status'
+data['Customer_Status'] = data['Customer_Status'].map({'Stayed': 0, 'Churned': 1})
+
+# Split data into features and target
+X = data.drop('Customer_Status', axis=1)
+y = data['Customer_Status']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+----------------------------------------------------------------------------------------------------
+
+# Training Random Forest Model
+# Initializing the Random Forest Classifier
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+
+# Training the model
+rf_model.fit(X_train, y_train)
+
+
+-----------------------------------------------------------------------------------------------
+
+# Evaluate Model
+# Make predictions
+y_pred = rf_model.predict(X_test)
+
+# Confustion Matrix
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+# Classification Report
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# Feature Selection
+importances = rf_model.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+# Plot the feature importance
+plt.figure(figsize=(15, 6))
+sns.barplot(x=importances[indices], y=X.columns[indices])
+plt.xlabel('Importance')
+plt.ylabel('Features Names')
+plt.title('Feature Importance')
+plt.show()
+
+-------------------------------------------------------------------------------------------------------
+from google.colab import files
+
+# Upload the CSV file
+uploaded = files.upload()
+
+-------------------------------------------------------------------------------------------------------
+
+# Reading csv data using pandas dataframe
+df_data = pd.read_csv('vw_JoinData_for_prediction.csv')
+
+# Displaying fetched data
+print(df_data.head())
+
+# Copying the original Dataframe to prevent from getting encoded columns(0 and 1)
+original_df = df_data.copy()
+
+# Preserving Customer_ID in New data
+customer_ids = df_data['Customer_ID']
+
+# Dropping unnecessary columns for prediction
+df_data = df_data.drop(['Customer_ID', 'Churn_Category','Customer_Status','Churn_Reason'], axis=1)
+
+# Encoding catergorical variables
+for column in df_data.select_dtypes(include=['object']).columns:
+    df_data[column] = label_encoders[column].transform(df_data[column])
+
+# Predictions
+new_predictions = rf_model.predict(df_data)
+
+# Adding Predictions to the original Dataframe
+original_df['Customer_Status_Predicted'] = new_predictions
+
+# Filtering the dataframe to include only records predicted as "Churned"
+original_df = original_df[original_df['Customer_Status_Predicted'] == 1]
+
+# Saving the results and downloading file
+original_df.to_csv('predicted_churned_customers.csv', index=False)
+files.download('predicted_churned_customers.csv')
+
+
+-----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
