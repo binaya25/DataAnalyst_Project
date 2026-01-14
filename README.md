@@ -12,4 +12,5 @@ You can find complete data analyst projects covering various business case scena
 ## Churn Analysis Summary and Prediction (SQL + PowerBI + Machine Learning)
 ## Links
 1. PowerBi Report: https://github.com/binaya25/DataAnalyst_Project/blob/main/Churn_Analysis(SQL%20%2B%20PowerBI%20%2B%20Machine%20Learning)/churn_analysis_PowerBI.pdf
+2. Churn analysis Report/Documentation: https://github.com/binaya25/DataAnalyst_Project/blob/main/Churn_Analysis(SQL%20%2B%20PowerBI%20%2B%20Machine%20Learning)/Customer%20churn%20analysis%20report/%F0%9F%93%98%20Customer%20Churn%20Analysis%20Report.pdf
 
